@@ -67,6 +67,8 @@
 </template>
 <script>
 import getDataList from "@/util";
+import storage from 'good-storage';
+
 export default {
   name: "Read",
   data() {
@@ -85,6 +87,7 @@ export default {
       restLine:'',
       restHear:'',
       dataList:[],
+      audio:null,
       initval: [
         { num: 0, flag: "", idx: 0 },
         { num: 0, flag: "", idx: 0 },
@@ -95,24 +98,52 @@ export default {
     };
   },
   created(){
-    const data=this.$route.query.data;
+    const data=storage.get('numbers') || '';
     this.dataList=getDataList(data);
+  },
+  mounted(){
+    this.initAudio();
+  },
+  beforeDestroy(){
+    // storage.remove('numbers');
   },
   computed: {
     blockData() {
+      let arr=[];
+      let len=0;
+      const padList= [
+        { num: 0, flag: "", idx: this.dataList.length+1 },
+        { num: 0, flag: "", idx: this.dataList.length+2 },
+        { num: 0, flag: "", idx: this.dataList.length+3 },
+        { num: 0, flag: "", idx: this.dataList.length+4 },
+        { num: 0, flag: "", idx: this.dataList.length+5},
+      ]
       if (this.pointer === 1) {
-        return this.initval.slice(0, 2).concat(this.dataList.slice(0, 3));
+        arr=this.initval.slice(0, 2).concat(this.dataList.slice(0, 3));
+        len=arr.length;
       } else if (this.pointer === 2) {
-        return this.initval.slice(0, 1).concat(this.dataList.slice(0, 4));
+        arr=this.initval.slice(0, 1).concat(this.dataList.slice(0, 4));
+        len=arr.length;
       } else {
-        return this.dataList.slice(this.pointer - 3, this.pointer + 2);
+        arr=this.dataList.slice(this.pointer - 3, this.pointer + 2);
+        len=arr.length;
       }
+      return len<5?arr.concat(padList.slice(0, 5-len)):arr;
     },
     rest() {
       return this.dataList.length - this.pointer + 1;
     }
   },
   methods: {
+    initAudio(){
+      this.audio=new Audio();
+      this.audio.onended = () => {
+        this.isfree = true;
+        this.lastTime = +new Date();
+        this.pointer++;
+        this.initAudio();
+      };
+    },
     startHear() {
       this.pointer = parseInt(this.hearVal) || 1;
       this.isInit = false;
@@ -158,25 +189,22 @@ export default {
       if (this.pointer<=this.dataList.length) {
         this.rid = requestAnimationFrame(this.readText);
       } else {
-        // startBtn.innerText = "开始";
-        // startBtn.classList.remove("red");
         this.isRead=false;
         this.isfree = false;
       }
     },
     readOne() {
-      var item = this.dataList[this.pointer - 1];
+      let item = this.dataList[this.pointer - 1];
       if (item && this.isfree) {
         this.isfree = false;
-        var text = item.num + (item.flag === "+" ? "加" : (item.flag === "-"?"减":''));
-        var msg = new SpeechSynthesisUtterance(text);
-        msg.onend = () => {
-          this.isfree = true;
-          this.lastTime = +new Date();
-          this.pointer++;
-        };
-        window.speechSynthesis.speak(msg);
+        let text = item.num + (item.flag === "+" ? "加" : (item.flag === "-"?"减":''));
+        this.audio.innerHTML=this.getSource(text);
+        this.audio.play();
       }
+    },
+    getSource(text){
+      let src='https://ss0.baidu.com/6KAZsjip0QIZ8tyhnq/text2audio?tex='+text+'&cuid=dict&lan=zh&ctp=1&pdt=30&vol=100&spd=3';
+      return `<source src=${src} type="audio/mp3">`
     }
   }
 };

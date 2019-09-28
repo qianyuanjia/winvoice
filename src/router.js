@@ -9,6 +9,6 @@ export default new Router({
     {
       path:'/read',
       component:()=>import('./views/Read')
-    }
+    },
   ]
 });

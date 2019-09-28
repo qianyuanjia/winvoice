@@ -35,6 +35,7 @@
 </template>
 <script>
 import { Icon} from "iview";
+import storage from 'good-storage';
 import moment from "moment";
 moment.locale("zh-cn");
 export default {
@@ -87,8 +88,8 @@ export default {
            this.$http.get('getnumber.php?id='+this.id+'&orderCode='+this.orderCode).then(res=>{
             if(res.data.code==200){
               const data=res.data.data;
-              // window.sourcedata=data.number;
-              this.$router.push({path:'/read',query:{data:data.number}});
+              storage.set('numbers',data.number);
+              this.$router.push('/read');
             }else{
               this.$Message.error('订单号错误！')
               this.orderCode='';
