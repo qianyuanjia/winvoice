@@ -4,7 +4,7 @@
       <span class="large-btn"
       @click="showTotal=true"
       >已阅读教程</span>
-      <p v-if="showTotal">初载入的序列，一共{{total}}根线</p>
+      <p v-if="showTotal">初载入的序列，一共{{dataList.length}}根线</p>
     </header>
     <section class="from-hear">
       <h2>这次从哪里开始呢？</h2>
@@ -66,7 +66,7 @@
   </div>
 </template>
 <script>
-import dataList from "@/util";
+import getDataList from "@/util";
 export default {
   name: "Read",
   data() {
@@ -82,9 +82,9 @@ export default {
       lastTime: +new Date(),
       rid:null,
       isRead:false,
-      total:dataList.length,
       restLine:'',
       restHear:'',
+      dataList:[],
       initval: [
         { num: 0, flag: "", idx: 0 },
         { num: 0, flag: "", idx: 0 },
@@ -94,36 +94,40 @@ export default {
       ]
     };
   },
+  created(){
+    const data=this.$route.query.data;
+    this.dataList=getDataList(data);
+  },
   computed: {
     blockData() {
       if (this.pointer === 1) {
-        return this.initval.slice(0, 2).concat(dataList.slice(0, 3));
+        return this.initval.slice(0, 2).concat(this.dataList.slice(0, 3));
       } else if (this.pointer === 2) {
-        return this.initval.slice(0, 1).concat(dataList.slice(0, 4));
+        return this.initval.slice(0, 1).concat(this.dataList.slice(0, 4));
       } else {
-        return dataList.slice(this.pointer - 3, this.pointer + 2);
+        return this.dataList.slice(this.pointer - 3, this.pointer + 2);
       }
     },
     rest() {
-      return dataList.length - this.pointer + 1;
+      return this.dataList.length - this.pointer + 1;
     }
   },
   methods: {
     startHear() {
       this.pointer = parseInt(this.hearVal) || 1;
       this.isInit = false;
-      this.restHear = this.total-this.pointer+1;
+      this.restHear = this.dataList.length-this.pointer+1;
       this.restLine='';
     },
     startLine() {
-      let index = dataList.findIndex((item, idx) => {
+      let index = this.dataList.findIndex((item, idx) => {
         return (
           item.num + item.flag === this.v1 &&
-          dataList[idx + 1].num + dataList[idx + 1].flag === this.v2
+          this.dataList[idx + 1].num + this.dataList[idx + 1].flag === this.v2
         );
       });
       this.pointer = index >= 0 ? index + 1 : this.pointer;
-      this.restLine = index >= 0 ? this.total-this.pointer+1 : '';
+      this.restLine = index >= 0 ? this.dataList.length-this.pointer+1 : '';
       this.isInit = false;
       this.restHear='';
     },
@@ -151,7 +155,7 @@ export default {
           this.readOne();
         }
       }
-      if (this.pointer<=dataList.length) {
+      if (this.pointer<=this.dataList.length) {
         this.rid = requestAnimationFrame(this.readText);
       } else {
         // startBtn.innerText = "开始";
@@ -161,7 +165,7 @@ export default {
       }
     },
     readOne() {
-      var item = dataList[this.pointer - 1];
+      var item = this.dataList[this.pointer - 1];
       if (item && this.isfree) {
         this.isfree = false;
         var text = item.num + (item.flag === "+" ? "加" : (item.flag === "-"?"减":''));

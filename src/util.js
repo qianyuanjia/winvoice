@@ -18,4 +18,4 @@ function getDataList(datastr) {
     }
     return newlist;
   }
-  export default getDataList(window.sourcedata);
+  export default getDataList;
