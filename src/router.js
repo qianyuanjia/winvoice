@@ -1,14 +1,21 @@
 import Router from 'vue-router';
+import User from './views/User';
+import Read from './views/Read';
+import Noid from './views/Noid';
 
 export default new Router({
   routes:[
     {
       path:'/',
-      component:()=>import('./views/User')
+      component:User
     },
     {
       path:'/read',
-      component:()=>import('./views/Read')
+      component:Read
+    },
+    {
+      path:'/noid',
+      component:Noid
     },
   ]
 });

@@ -210,7 +210,8 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$color:#4992DC;
 .readWrapper{
   -webkit-overflow-scrolling: touch;
   padding: 2vw;
@@ -218,7 +219,7 @@ export default {
 .large-btn {
   display: inline-block;
   border-radius: 4px;
-  background-color: #50ae32;
+  background-color: $color;
   color: #fff;
   font-size: 4vw;
   padding: 3vw 0;
@@ -226,13 +227,13 @@ export default {
   width: 100%;
 }
 .large-btn:active {
-  background-color: #38861f;
+  background-color: $color;
 }
 .head {
   margin-bottom: 15vw;
 }
 .head >p{
-  color:#6fbc38;
+  color:$color;
   text-align: center;
   margin-top:5px;
 }
@@ -242,11 +243,11 @@ export default {
   text-align: center;
 }
 .from-line >p:last-child{
-  color:#6fbc38;
+  color:$color;
   margin-top:5px;
 }
 .from-hear >p:last-child{
-  color:#6fbc38;
+  color:$color;
   margin-top:5px;
 }
 .from-hear h2,
@@ -292,10 +293,11 @@ export default {
 .work-area .block {
   width: 20%;
   height: 20vw;
-  background: #6fbc38;
+  background: $color;
   border-radius: 6px;
   text-align: center;
   position: relative;
+  color: #000;
 }
 .block > em {
   font-size: 5vw;

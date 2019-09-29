@@ -4,9 +4,9 @@
       <img :src="baseUrl+'/qsfx'+userInfo.img_url" alt v-if="userInfo.img_url"/>
     </header>
     <section>
-      <figure>
+      <figure @click="startMake">
         <Icon type="ios-build" />
-        <figcaption @click="startMake">开始制作</figcaption>
+        <figcaption>开始制作</figcaption>
       </figure>
       <figure>
         <Icon type="ios-cart" />
@@ -52,8 +52,12 @@ export default {
     };
   },
   created() {
-    this.id=this.$route.query.id || '';
-    this.init();
+    this.id=this.$route.query.id;
+    if(!this.id){
+      this.$router.push('/noid');
+    }else{
+      this.init();
+    }
   },
   methods: {
     init() {
