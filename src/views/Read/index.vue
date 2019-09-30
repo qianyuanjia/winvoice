@@ -66,7 +66,7 @@
   </div>
 </template>
 <script>
-import getDataList from "@/util";
+import {getDataList,isIos} from "@/util";
 import storage from 'good-storage';
 
 export default {
@@ -98,14 +98,20 @@ export default {
     };
   },
   created(){
-    const data=storage.get('numbers') || '';
-    this.dataList=getDataList(data);
+    const isLog=storage.get('isLog');
+    if(!isLog){
+      this.$router.push('/');
+    }else{
+      const data=storage.get('numbers') || '';
+      this.dataList=getDataList(data);
+    }
   },
   mounted(){
-    this.initAudio();
+      this.initAudio();
   },
-  beforeDestroy(){
-    // storage.remove('numbers');
+  destroyed(){
+    storage.remove('isLog');
+    storage.remove('numbers');
   },
   computed: {
     blockData() {
@@ -198,8 +204,23 @@ export default {
       if (item && this.isfree) {
         this.isfree = false;
         let text = item.num + (item.flag === "+" ? "加" : (item.flag === "-"?"减":''));
-        this.audio.innerHTML=this.getSource(text);
-        this.audio.play();
+        if(!isIos()){
+          this.audio.innerHTML=this.getSource(text);
+          this.audio.play();
+        }else{
+          if(window.speechSynthesis){
+            var msg = new SpeechSynthesisUtterance(text);
+            msg.onend = () => {
+              this.isfree = true;
+              this.lastTime = +new Date();
+              this.pointer++;
+            };
+            window.speechSynthesis.speak(msg);
+          }else{
+            this.audio.innerHTML=this.getSource(text);
+            this.audio.play();
+          }
+        }
       }
     },
     getSource(text){

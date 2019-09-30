@@ -93,6 +93,7 @@ export default {
             if(res.data.code==200){
               const data=res.data.data;
               storage.set('numbers',data.number);
+              storage.set('isLog',true);
               this.$router.push('/read');
             }else{
               this.$Message.error('订单号错误！')
